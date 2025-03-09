@@ -96,8 +96,8 @@ const ProductTable: React.FC = () => {
         <AddProductButton onClick={() => setShowModal(true)} />
       </div>
 
-      <div className="flex justify-center overflow-x-auto">
-        <table className="min-w-[80%] table-auto">
+      <div className="w-full overflow-auto bg-[var(--background)]">
+      <table className="w-full min-w-[800px] table-auto bg-white shadow-md rounded-lg">
           <thead>
             <tr>
               <th className="border px-4 py-2">ID</th>
