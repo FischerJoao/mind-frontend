@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from "react";
-import { newUser } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -9,14 +8,37 @@ export default function Register() {
   const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const router = useRouter();
+
+  const passwordRegex = /((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/;
+
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!email || !/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = 'Email inválido';
+    }
+
+    if (!password || password.length < 4 || password.length > 20 || !passwordRegex.test(password)) {
+      newErrors.password = 'Senha deve ter entre 4 e 20 caracteres, e conter ao menos uma letra maiúscula, uma minúscula e um número ou caractere especial';
+    }
+
+    if (!name || name.length === 0) {
+      newErrors.name = 'Nome é obrigatório';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   async function handleSubmit(event: React.SyntheticEvent) {
     event.preventDefault();
 
-    // Enviar os dados para o backend para criar o usuário
-    const response = await fetch('/api/register', {
+    if (!validateForm()) return;
+
+    const response = await fetch('http://localhost:3000/user/newUser', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -25,8 +47,8 @@ export default function Register() {
     });
 
     if (response.ok) {
-      // Caso o cadastro seja bem-sucedido, redireciona para a página de login
-      router.push('/auth-routes/login');
+      window.alert('Cadastro realizado com sucesso!');
+      router.push('/');
     } else {
       console.log('Erro no cadastro');
     }
@@ -66,6 +88,7 @@ export default function Register() {
             color: '#333'
           }}
         />
+        {errors.name && <p style={{ color: 'red', fontSize: '12px' }}>{errors.name}</p>}
 
         <label htmlFor="email" style={{ marginBottom: '5px' }}>Email</label>
         <input
@@ -84,6 +107,7 @@ export default function Register() {
             color: '#333'
           }}
         />
+        {errors.email && <p style={{ color: 'red', fontSize: '12px' }}>{errors.email}</p>}
 
         <label htmlFor="password" style={{ marginBottom: '5px' }}>Senha</label>
         <input
@@ -102,6 +126,7 @@ export default function Register() {
             color: '#333'
           }}
         />
+        {errors.password && <p style={{ color: 'red', fontSize: '12px' }}>{errors.password}</p>}
 
         <button 
           type="submit" 
@@ -119,7 +144,7 @@ export default function Register() {
         </button>
 
         <div style={{ marginTop: '15px', textAlign: 'center' }}>
-          <p style={{ fontSize: '13px' }}>Já tem uma conta? <Link href="/" style={{ color: '#ff6f00' }}>Faça login</Link></p>
+          <p style={{ fontSize: '13px' }}>Já tem uma conta? <Link href="/auth-routes/login" style={{ color: '#ff6f00' }}>Faça login</Link></p>
         </div>
       </form>
     </div>
