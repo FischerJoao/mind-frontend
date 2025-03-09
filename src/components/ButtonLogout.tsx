@@ -14,5 +14,5 @@ export default function ButtonLogout(){
 		router.replace('/')
 	}
 
- return <button onClick={logout} className="p-2 w-40 border border-gray-300 rounded-md">Sair</button>
+ return <button onClick={logout} className="p-2 w-40 border border-[var(--foreground)] rounded-md">Sair</button>
 }
