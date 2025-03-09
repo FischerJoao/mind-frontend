@@ -8,7 +8,7 @@ export default function Admin() {
       <Header />
 
       {/* Conteúdo da Página */}
-      <main className="flex-1 p-4">
+      <main className="flex-1 p-4 bg-[var(--background)]">
         {/* Exibindo a tabela de produtos */}
         <ProductTable />
       </main>
