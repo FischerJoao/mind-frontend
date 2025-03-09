@@ -1,4 +1,5 @@
 import Header from "@/components/Header";
+import ProductTable from "@/components/ProductTable "; // Importando o ProductTable
 
 export default function Admin() {
   return (
@@ -8,7 +9,8 @@ export default function Admin() {
 
       {/* Conteúdo da Página */}
       <main className="flex-1 p-4">
-        
+        {/* Exibindo a tabela de produtos */}
+        <ProductTable />
       </main>
     </div>
   );
