@@ -1,6 +1,11 @@
-'use client'
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
+import EditButton from './EditButton';
+import DeleteButton from './DeleteButton';
+import AddProductButton from './AddProductButton';
+import AddProductModal from './AddProductModal';
 
 interface Product {
   id: string;
@@ -15,75 +20,132 @@ const ProductTable: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const { data: session, status } = useSession();
+  const [showModal, setShowModal] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  const fetchProducts = async () => {
+    if (!session?.user?.access_token) {
+      console.error('Token não encontrado na sessão');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:3000/product/AllProducts', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.user.access_token}`,
+        },
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setProducts(data);
+      } else {
+        console.error('Erro ao buscar produtos');
+      }
+    } catch (error) {
+      console.error('Erro na requisição', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    if (status === 'loading') return; // Aguardar carregamento completo da sessão
+    if (status !== 'loading') {
+      fetchProducts();
+    }
+  }, [session, status]);
 
-    const fetchProducts = async () => {
-      if (!session?.user?.access_token) {
-        console.error('Token não encontrado na sessão');
-        setLoading(false);
-        return;
-      }
+  const handleDeleteSuccess = (deletedProductId: string) => {
+    setProducts((prevProducts) =>
+      prevProducts.filter((product) => product.id !== deletedProductId)
+    );
+  };
 
-      try {
-        const response = await fetch('http://localhost:3000/product/AllProducts', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session.user.access_token}`, // Usando access_token
-          },
-          credentials: 'include',
-        });
+  const handleAddProduct = async (newProduct: any) => {
+    console.log('Produto Adicionado:', newProduct);
+    setShowModal(false);
+    
+    // Aguarda um curto período e busca os produtos do backend
+    setTimeout(fetchProducts, 500);
+  };
 
-        if (response.ok) {
-          const data = await response.json();
-          setProducts(data); // Atualiza os produtos
-        } else {
-          console.error('Erro ao buscar produtos');
-        }
-      } catch (error) {
-        console.error('Erro na requisição', error);
-      } finally {
-        setLoading(false); // Remove o carregamento
-      }
-    };
+  const handleEditProduct = (product: Product) => {
+    setEditingProduct(product);
+    setShowModal(true);
+  };
 
-    fetchProducts(); // Chama a função quando a sessão for carregada
-  }, [session, status]); // Rerun the effect if session or status changes
+  const updateProductInList = (updatedProduct: Product) => {
+    setProducts((prevProducts) =>
+      prevProducts.map((product) =>
+        product.id === updatedProduct.id ? updatedProduct : product
+      )
+    );
+  };
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full table-auto">
-        <thead>
-          <tr>
-            <th className="border px-4 py-2">ID</th>
-            <th className="border px-4 py-2">Name</th>
-            <th className="border px-4 py-2">Description</th>
-            <th className="border px-4 py-2">Image</th>
-            <th className="border px-4 py-2">Price</th>
-            <th className="border px-4 py-2">Quantity</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products.map((product) => (
-            <tr key={product.id}>
-              <td className="border px-4 py-2">{product.id}</td>
-              <td className="border px-4 py-2">{product.name}</td>
-              <td className="border px-4 py-2">{product.description}</td>
-              <td className="border px-4 py-2">
-                <img src={product.imageUrl} alt={product.name} className="w-16 h-16 object-cover" />
-              </td>
-              <td className="border px-4 py-2">{product.price}</td>
-              <td className="border px-4 py-2">{product.quantity}</td>
+    <div className="flex flex-col items-center">
+      <div className="mb-6">
+        <AddProductButton onClick={() => setShowModal(true)} />
+      </div>
+
+      <div className="flex justify-center overflow-x-auto">
+        <table className="min-w-[80%] table-auto">
+          <thead>
+            <tr>
+              <th className="border px-4 py-2">ID</th>
+              <th className="border px-4 py-2">Nome</th>
+              <th className="border px-4 py-2">Descrição</th>
+              <th className="border px-4 py-2">Imagem</th>
+              <th className="border px-4 py-2">Preço unidade</th>
+              <th className="border px-4 py-2">Quantidade</th>
+              <th className="border px-4 py-2">Ações</th> 
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {products.map((product) => (
+              <tr key={product.id}>
+                <td className="border px-4 py-2">{product.id}</td>
+                <td className="border px-4 py-2">{product.name}</td>
+                <td className="border px-4 py-2">{product.description}</td>
+                <td className="border px-4 py-2">
+                  <img
+                    src={product.imageUrl}
+                    alt={product.name}
+                    className="w-16 h-16 object-cover"
+                  />
+                </td>
+                <td className="border px-4 py-2">{product.price}</td>
+                <td className="border px-4 py-2">{product.quantity}</td>
+                <td className="border px-4 py-2 text-center">
+                  <EditButton onClick={() => handleEditProduct(product)} />
+                  <DeleteButton
+                    productId={product.id}
+                    accessToken={session.user.access_token}
+                    onDeleteSuccess={handleDeleteSuccess}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {showModal && (
+        <AddProductModal
+          onAddProduct={handleAddProduct}
+          onUpdateProduct={updateProductInList}
+          onClose={() => setShowModal(false)}
+          product={editingProduct || undefined}
+        />
+      )}
     </div>
   );
 };
