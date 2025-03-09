@@ -9,7 +9,7 @@ export default async function Admin(){
 	
 
 	return (
-		<div className="w-full h-screen flex flex-col items-center justify-center">
+		<div className="w-full h-screen flex flex-col items-center justify-center min-h-screen bg-[var(--background)] text-[var(--foreground)]" >
 			<h1 className="text-2xl mb-8">Olá, {session?.user.name}. Bem vindo(a)!</h1>
 			<ButtonLogout />
 		</div>
