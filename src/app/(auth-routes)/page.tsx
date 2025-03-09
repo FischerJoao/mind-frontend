@@ -96,7 +96,7 @@ export default function Home() {
         </button>
 
         <div style={{ marginTop: '15px', textAlign: 'center' }}>
-          <p style={{ fontSize: '13px' }}>Ainda não tem uma conta? <a href="#" style={{ color: '#ff6f00' }}>Cadastre-se</a></p>
+          <p style={{ fontSize: '13px' }}>Ainda não tem uma conta? <a href="/register" style={{ color: '#ff6f00' }}>Cadastre-se</a></p>
         </div>
       </form>
     </div>
