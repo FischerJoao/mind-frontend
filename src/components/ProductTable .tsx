@@ -6,6 +6,7 @@ import EditButton from "./EditButton";
 import DeleteButton from "./DeleteButton";
 import AddProductButton from "./AddProductButton";
 import AddProductModal from "./AddProductModal";
+import UpdateProductModal from "./UpdateProductModal";
 
 interface Product {
   id: string;
@@ -31,17 +32,14 @@ const ProductTable: React.FC = () => {
     }
 
     try {
-      const response = await fetch(
-        "http://localhost:3000/product/AllProducts",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session.user.access_token}`,
-          },
-          credentials: "include",
-        }
-      );
+      const response = await fetch("http://localhost:3000/product/AllProducts", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.user.access_token}`,
+        },
+        credentials: "include",
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -68,12 +66,14 @@ const ProductTable: React.FC = () => {
     );
   };
 
-  const handleAddProduct = async (newProduct: any) => {
-    console.log("Produto Adicionado:", newProduct);
+  const handleCloseModal = () => {
     setShowModal(false);
+    fetchProducts(); // Recarrega a lista de produtos ao fechar o modal
+  };
 
-    // Aguarda um curto período e busca os produtos do backend
-    setTimeout(fetchProducts, 500);
+  const handleAddProduct = async (newProduct: Product) => {
+    console.log("Produto Adicionado:", newProduct);
+    handleCloseModal();
   };
 
   const handleEditProduct = (product: Product) => {
@@ -87,6 +87,7 @@ const ProductTable: React.FC = () => {
         product.id === updatedProduct.id ? updatedProduct : product
       )
     );
+    handleCloseModal();
   };
 
   if (loading) {
@@ -96,7 +97,12 @@ const ProductTable: React.FC = () => {
   return (
     <div className="flex flex-col items-center">
       <div className="mb-6">
-        <AddProductButton onClick={() => setShowModal(true)} />
+        <AddProductButton
+          onClick={() => {
+            setEditingProduct(null);
+            setShowModal(true);
+          }}
+        />
       </div>
 
       <div className="w-full overflow-auto bg-[var(--background)]">
@@ -109,7 +115,7 @@ const ProductTable: React.FC = () => {
               <th className="border px-4 py-2">Imagem</th>
               <th className="border px-4 py-2">Preço unidade</th>
               <th className="border px-4 py-2">Quantidade</th>
-              <th className="border px-4 py-2">Ações</th>
+              <th className="border px-4 py-2">Adicionar Imagem / Editar / Remover</th>
             </tr>
           </thead>
           <tbody>
@@ -121,12 +127,12 @@ const ProductTable: React.FC = () => {
                 <td className="border px-4 py-2">
                   {product.imageUrl ? (
                     <img
-                    src={`http://localhost:3000${product.imageUrl}`}
+                      src={`http://localhost:3000${product.imageUrl}`}
                       alt={product.name}
                       className="w-16 h-16 object-cover"
                     />
                   ) : (
-                    <span>No Image</span> // Ou outro placeholder de sua escolha
+                    <span>No Image</span>
                   )}
                 </td>
                 <td className="border px-4 py-2">{product.price} R$</td>
@@ -135,7 +141,7 @@ const ProductTable: React.FC = () => {
                   <EditButton onClick={() => handleEditProduct(product)} />
                   <DeleteButton
                     productId={product.id}
-                    accessToken={session.user.access_token}
+                    accessToken={session?.user?.access_token}
                     onDeleteSuccess={handleDeleteSuccess}
                   />
                 </td>
@@ -146,12 +152,20 @@ const ProductTable: React.FC = () => {
       </div>
 
       {showModal && (
-        <AddProductModal
-          onAddProduct={handleAddProduct}
-          onUpdateProduct={updateProductInList}
-          onClose={() => setShowModal(false)}
-          product={editingProduct || undefined}
-        />
+        <>
+          {editingProduct ? (
+            <UpdateProductModal
+              onUpdateProduct={updateProductInList}
+              onClose={handleCloseModal}
+              product={editingProduct}
+            />
+          ) : (
+            <AddProductModal
+              onAddProduct={handleAddProduct}
+              onClose={handleCloseModal}
+            />
+          )}
+        </>
       )}
     </div>
   );
