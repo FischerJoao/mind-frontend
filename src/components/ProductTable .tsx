@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
-import EditButton from './EditButton';
-import DeleteButton from './DeleteButton';
-import AddProductButton from './AddProductButton';
-import AddProductModal from './AddProductModal';
+import React, { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import EditButton from "./EditButton";
+import DeleteButton from "./DeleteButton";
+import AddProductButton from "./AddProductButton";
+import AddProductModal from "./AddProductModal";
 
 interface Product {
   id: string;
@@ -25,36 +25,39 @@ const ProductTable: React.FC = () => {
 
   const fetchProducts = async () => {
     if (!session?.user?.access_token) {
-      console.error('Token não encontrado na sessão');
+      console.error("Token não encontrado na sessão");
       setLoading(false);
       return;
     }
 
     try {
-      const response = await fetch('http://localhost:3000/product/AllProducts', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.user.access_token}`,
-        },
-        credentials: 'include',
-      });
+      const response = await fetch(
+        "http://localhost:3000/product/AllProducts",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.user.access_token}`,
+          },
+          credentials: "include",
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
         setProducts(data);
       } else {
-        console.error('Erro ao buscar produtos');
+        console.error("Erro ao buscar produtos");
       }
     } catch (error) {
-      console.error('Erro na requisição', error);
+      console.error("Erro na requisição", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (status !== 'loading') {
+    if (status !== "loading") {
       fetchProducts();
     }
   }, [session, status]);
@@ -66,9 +69,9 @@ const ProductTable: React.FC = () => {
   };
 
   const handleAddProduct = async (newProduct: any) => {
-    console.log('Produto Adicionado:', newProduct);
+    console.log("Produto Adicionado:", newProduct);
     setShowModal(false);
-    
+
     // Aguarda um curto período e busca os produtos do backend
     setTimeout(fetchProducts, 500);
   };
@@ -97,8 +100,8 @@ const ProductTable: React.FC = () => {
       </div>
 
       <div className="w-full overflow-auto bg-[var(--background)]">
-      <table className="w-full min-w-[800px] table-auto bg-white shadow-md rounded-lg">
-          <thead>
+        <table className="w-full min-w-[800px] table-auto bg-white shadow-md rounded-lg">
+          <thead className="bg-orange-500 text-white">
             <tr>
               <th className="border px-4 py-2">ID</th>
               <th className="border px-4 py-2">Nome</th>
@@ -106,7 +109,7 @@ const ProductTable: React.FC = () => {
               <th className="border px-4 py-2">Imagem</th>
               <th className="border px-4 py-2">Preço unidade</th>
               <th className="border px-4 py-2">Quantidade</th>
-              <th className="border px-4 py-2">Ações</th> 
+              <th className="border px-4 py-2">Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -116,11 +119,15 @@ const ProductTable: React.FC = () => {
                 <td className="border px-4 py-2">{product.name}</td>
                 <td className="border px-4 py-2">{product.description}</td>
                 <td className="border px-4 py-2">
-                  <img
-                    src={product.imageUrl}
-                    alt={product.name}
-                    className="w-16 h-16 object-cover"
-                  />
+                  {product.imageUrl ? (
+                    <img
+                      src={product.imageUrl}
+                      alt={product.name}
+                      className="w-16 h-16 object-cover"
+                    />
+                  ) : (
+                    <span>No Image</span> // Ou outro placeholder de sua escolha
+                  )}
                 </td>
                 <td className="border px-4 py-2">{product.price}</td>
                 <td className="border px-4 py-2">{product.quantity}</td>
