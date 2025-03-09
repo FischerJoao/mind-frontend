@@ -1,17 +1,16 @@
-import { nextAuthOptions } from "@/app/api/auth/[...nextauth]/route"
-import ButtonLogout from "@/components/ButtonLogout"
-import { getServerSession } from "next-auth"
+import Header from "@/components/Header";
+import ProductList from "@/components/ProductList"; // Importe o ProductList aqui
 
+export default function Admin() {
+  return (
+    <div className="w-full h-screen flex flex-col bg-[var(--background)] text-[var(--foreground)]">
+      {/* Adicionando o Header */}
+      <Header />
 
-export default async function Admin(){
-	const session = await getServerSession(nextAuthOptions)
-
-	
-
-	return (
-		<div className="w-full h-screen flex flex-col items-center justify-center min-h-screen bg-[var(--background)] text-[var(--foreground)]" >
-			<h1 className="text-2xl mb-8">Olá, {session?.user.name}. Bem vindo(a)!</h1>
-			<ButtonLogout />
-		</div>
-	)
+      {/* Conteúdo da Página */}
+      <main className="flex-1 p-4">
+        <ProductList /> {/* Exibe o componente ProductList na página */}
+      </main>
+    </div>
+  );
 }
