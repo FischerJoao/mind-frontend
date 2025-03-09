@@ -44,7 +44,7 @@ const nextAuthOptions: NextAuthOptions = {
 			return token
 		},
 		async session({ session, token }) {
-			session.user = token.user as any;  // ✅ Agora session mantém a estrutura correta
+			session.user = token.user as any;
 			return session;
 		}
 	}
