@@ -121,7 +121,7 @@ const ProductTable: React.FC = () => {
                 <td className="border px-4 py-2">
                   {product.imageUrl ? (
                     <img
-                      src={product.imageUrl}
+                    src={`http://localhost:3000${product.imageUrl}`}
                       alt={product.name}
                       className="w-16 h-16 object-cover"
                     />
@@ -129,7 +129,7 @@ const ProductTable: React.FC = () => {
                     <span>No Image</span> // Ou outro placeholder de sua escolha
                   )}
                 </td>
-                <td className="border px-4 py-2">{product.price}</td>
+                <td className="border px-4 py-2">{product.price} R$</td>
                 <td className="border px-4 py-2">{product.quantity}</td>
                 <td className="border px-4 py-2 text-center">
                   <EditButton onClick={() => handleEditProduct(product)} />
