@@ -68,7 +68,7 @@ const ProductTable: React.FC = () => {
 
   const handleCloseModal = () => {
     setShowModal(false);
-    fetchProducts(); // Recarrega a lista de produtos ao fechar o modal
+    fetchProducts(); 
   };
 
   const handleAddProduct = async (newProduct: Product) => {

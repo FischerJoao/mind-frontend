@@ -3,7 +3,7 @@ import React from 'react';
 interface DeleteButtonProps {
   productId: string;
   accessToken: string;
-  onDeleteSuccess: (productId: string) => void; // Atualize a assinatura para aceitar o ID do produto
+  onDeleteSuccess: (productId: string) => void; 
 }
 
 const DeleteButton: React.FC<DeleteButtonProps> = ({ productId, accessToken, onDeleteSuccess }) => {
@@ -18,7 +18,7 @@ const DeleteButton: React.FC<DeleteButtonProps> = ({ productId, accessToken, onD
       });
 
       if (response.ok) {
-        onDeleteSuccess(productId); // Passa o productId para a função de sucesso
+        onDeleteSuccess(productId); 
         alert('Produto deletado com sucesso');
       } else {
         alert('Erro ao deletar produto');

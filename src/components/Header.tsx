@@ -8,19 +8,19 @@ export default function Header() {
 
   return (
     <header className="flex items-center justify-between bg-orange-500 p-4 shadow-md text-white">
-      {/* Logo */}
+      
       <div className="flex items-center gap-2">
         <span className='text-3xl'>📦</span>
         <span className="text-xl font-bold hidden sm:block">ESTOQUE</span>
 
       </div>
 
-      {/* Saudação */}
+      
       <div className="text-lg">
         Olá, <span className="font-semibold">{session?.user?.name || 'Visitante'}</span>. Bem-vindo(a)!
       </div>
 
-      {/* Botão de Logout */}
+    
       <ButtonLogout />
     </header>
   )

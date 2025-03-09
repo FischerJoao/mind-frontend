@@ -12,7 +12,7 @@ interface Product {
 const UpdateProductModal: React.FC<{
   onUpdateProduct: (product: Product) => void;
   onClose: () => void;
-  product: Product; // O produto agora é obrigatório para edição
+  product: Product; 
 }> = ({ onUpdateProduct, onClose, product }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -29,7 +29,7 @@ const UpdateProductModal: React.FC<{
     setDescription(product.description);
     setPrice(String(product.price));
     setQuantity(product.quantity);
-    setImagePreview(product.imageUrl || null); // Se houver imagem no produto, mostra o preview
+    setImagePreview(product.imageUrl || null); 
   }, [product]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,18 +77,18 @@ const UpdateProductModal: React.FC<{
         description,
         price: numericPrice,
         quantity: numericQuantity,
-        imageUrl: product.imageUrl || '', // Usar a imagem existente, se não houver novo arquivo
+        imageUrl: product.imageUrl || '', 
       };
   
-      const finalProductData = { ...productData }; // Copiar os dados iniciais
+      const finalProductData = { ...productData }; 
   
-      // Se houver um novo arquivo de imagem, enviar para o servidor
+      
       if (imageFile) {
         const formData = new FormData();
         formData.append('image', imageFile);
-        formData.append('productData', JSON.stringify(finalProductData)); // Incluir os dados do produto
+        formData.append('productData', JSON.stringify(finalProductData)); 
   
-        // Enviar imagem e dados do produto de uma vez
+        
         const response = await fetch(`http://localhost:3000/product/upload/${product.id}`, {
           method: 'PATCH',
           body: formData,
@@ -102,12 +102,12 @@ const UpdateProductModal: React.FC<{
           throw new Error(`Erro ao atualizar produto: ${errorData.message || 'Erro desconhecido'}`);
         }
   
-        // Atualiza a interface com o produto editado
+        
         const updatedProduct = await response.json();
-        onUpdateProduct(updatedProduct); // Atualiza a interface com os dados do produto atualizado
+        onUpdateProduct(updatedProduct); 
   
       } else {
-        // Se não houver nova imagem, apenas atualiza os dados do produto
+        
         const response = await fetch(`http://localhost:3000/product/upload/${product.id}`, {
           method: 'PATCH',
           body: JSON.stringify(finalProductData),
@@ -122,12 +122,12 @@ const UpdateProductModal: React.FC<{
           throw new Error(`Erro ao atualizar produto: ${errorData.message || 'Erro desconhecido'}`);
         }
   
-        // Atualiza a interface com o produto editado
+        
         const updatedProduct = await response.json();
-        onUpdateProduct(updatedProduct); // Atualiza a interface com os dados do produto atualizado
+        onUpdateProduct(updatedProduct); 
       }
   
-      // Fecha o modal após sucesso
+      
       onClose();
       
     } catch (error) {

@@ -48,7 +48,7 @@ const AddProductModal: React.FC<{
         quantity: numericQuantity,
       };
   
-      // 1. Criar o produto (sem a imagem)
+      
       const createResponse = await fetch('http://localhost:3000/product/NewProduct', {
         method: 'POST',
         body: JSON.stringify(productData),
@@ -64,10 +64,10 @@ const AddProductModal: React.FC<{
       }
   
       const createData = await createResponse.json();
-      const productId = createData.id; // Supondo que o ID do produto seja retornado
+      const productId = createData.id; 
   
       onAddProduct({ ...productData, id: productId });
-      onClose(); // Fechar o modal após sucesso
+      onClose(); 
   
     } catch (error) {
       console.error('Erro ao adicionar produto:', error);
