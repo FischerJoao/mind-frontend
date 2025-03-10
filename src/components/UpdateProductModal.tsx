@@ -12,7 +12,7 @@ interface Product {
 const UpdateProductModal: React.FC<{
   onUpdateProduct: (product: Product) => void;
   onClose: () => void;
-  product: Product; 
+  product: Product;
 }> = ({ onUpdateProduct, onClose, product }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -29,7 +29,7 @@ const UpdateProductModal: React.FC<{
     setDescription(product.description);
     setPrice(String(product.price));
     setQuantity(product.quantity);
-    setImagePreview(product.imageUrl || null); 
+    setImagePreview(product.imageUrl || null); // Preenche o preview com a imagem já existente
   }, [product]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,83 +53,65 @@ const UpdateProductModal: React.FC<{
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
-  
+
     const numericPrice = parseFloat(price);
     const numericQuantity = Math.max(0, quantity);
-  
+
     if (!name || !description || !price || isNaN(numericPrice) || numericPrice <= 0 || numericQuantity < 0) {
       setError('Todos os campos são obrigatórios e o preço deve ser um número positivo.');
       setIsSubmitting(false);
       return;
     }
-  
-    const token = localStorage.getItem('token');
-  
-    if (!token) {
-      setError('Você precisa estar autenticado.');
-      setIsSubmitting(false);
-      return;
-    }
-  
+
     try {
+      // Atualiza os dados do produto
       const productData = {
         name,
         description,
         price: numericPrice,
         quantity: numericQuantity,
-        imageUrl: product.imageUrl || '', 
       };
-  
-      const finalProductData = { ...productData }; 
-  
-      
+
+      // Cria o FormData para enviar a atualização do produto e a imagem
+      const formData = new FormData();
+      formData.append('productData', JSON.stringify(productData));
+
+      // Adiciona a imagem ao formData, se ela existir
       if (imageFile) {
-        const formData = new FormData();
         formData.append('image', imageFile);
-        formData.append('productData', JSON.stringify(finalProductData)); 
-  
-        
-        const response = await fetch(`http://localhost:3000/product/upload/${product.id}`, {
+      }
+
+      // Primeiro, envia os dados do produto (sem a imagem)
+      const responseUpdate = await fetch(`http://localhost:3000/product/updateProduct/${product.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(productData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!responseUpdate.ok) {
+        const errorData = await responseUpdate.json();
+        throw new Error(`Erro ao atualizar produto: ${errorData.message || 'Erro desconhecido'}`);
+      }
+
+      // Envia o upload da imagem se houver imagem
+      if (imageFile) {
+        const responseImage = await fetch(`http://localhost:3000/product/upload/${product.id}`, {
           method: 'PATCH',
           body: formData,
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
         });
-  
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(`Erro ao atualizar produto: ${errorData.message || 'Erro desconhecido'}`);
+
+        if (!responseImage.ok) {
+          const errorData = await responseImage.json();
+          throw new Error(`Erro ao enviar imagem: ${errorData.message || 'Erro desconhecido'}`);
         }
-  
-        
-        const updatedProduct = await response.json();
-        onUpdateProduct(updatedProduct); 
-  
-      } else {
-        
-        const response = await fetch(`http://localhost:3000/product/upload/${product.id}`, {
-          method: 'PATCH',
-          body: JSON.stringify(finalProductData),
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-  
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(`Erro ao atualizar produto: ${errorData.message || 'Erro desconhecido'}`);
-        }
-  
-        
-        const updatedProduct = await response.json();
-        onUpdateProduct(updatedProduct); 
       }
-  
-      
+
+      // Após sucesso, chama a função onUpdateProduct para atualizar o estado no componente pai
+      const updatedProduct = await responseUpdate.json();
+      onUpdateProduct(updatedProduct);
       onClose();
-      
     } catch (error) {
       console.error('Erro ao processar produto:', error);
       setError(error instanceof Error ? error.message : 'Erro desconhecido ao processar a operação');
@@ -137,7 +119,6 @@ const UpdateProductModal: React.FC<{
       setIsSubmitting(false);
     }
   };
-  
 
   return (
     <div className="fixed inset-0 flex justify-center items-center bg-gray-800 bg-opacity-50 z-50 overflow-y-auto p-4">

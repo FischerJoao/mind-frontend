@@ -22,24 +22,16 @@ const AddProductModal: React.FC<{
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
-  
+
     const numericPrice = parseFloat(price);
     const numericQuantity = Math.max(0, quantity);
-  
+
     if (!name || !description || !price || isNaN(numericPrice) || numericPrice <= 0 || numericQuantity < 0) {
       setError('Todos os campos são obrigatórios e o preço deve ser um número positivo.');
       setIsSubmitting(false);
       return;
     }
-  
-    const token = localStorage.getItem('token');
-  
-    if (!token) {
-      setError('Você precisa estar autenticado.');
-      setIsSubmitting(false);
-      return;
-    }
-  
+
     try {
       const productData = {
         name,
@@ -47,28 +39,26 @@ const AddProductModal: React.FC<{
         price: numericPrice,
         quantity: numericQuantity,
       };
-  
-      
+
       const createResponse = await fetch('http://localhost:3000/product/NewProduct', {
         method: 'POST',
         body: JSON.stringify(productData),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
       });
-  
+
       if (!createResponse.ok) {
         const errorData = await createResponse.json().catch(() => ({}));
         throw new Error(errorData.message || 'Erro ao criar o produto');
       }
-  
+
       const createData = await createResponse.json();
-      const productId = createData.id; 
-  
+      const productId = createData.id;
+
       onAddProduct({ ...productData, id: productId });
-      onClose(); 
-  
+      onClose();
+
     } catch (error) {
       console.error('Erro ao adicionar produto:', error);
       setError(error instanceof Error ? error.message : 'Erro desconhecido ao processar a operação');
