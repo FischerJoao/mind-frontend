@@ -2,7 +2,7 @@ import React from 'react';
 
 interface DeleteButtonProps {
   productId: string;
-  accessToken: string;
+  accessToken?: string;
   onDeleteSuccess: (productId: string) => void; 
 }
 

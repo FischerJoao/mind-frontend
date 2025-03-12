@@ -50,7 +50,7 @@ export default function Register() {
       window.alert('Cadastro realizado com sucesso!');
       router.push('/');
     } else {
-      console.log('Erro no cadastro');
+      window.alert('Erro no cadastro!')
     }
   }
 
@@ -144,7 +144,7 @@ export default function Register() {
         </button>
 
         <div style={{ marginTop: '15px', textAlign: 'center' }}>
-          <p style={{ fontSize: '13px' }}>Já tem uma conta? <Link href="/auth-routes/login" style={{ color: '#ff6f00' }}>Faça login</Link></p>
+          <p style={{ fontSize: '13px' }}>Já tem uma conta? <Link href="/" style={{ color: '#ff6f00' }}>Faça login</Link></p>
         </div>
       </form>
     </div>
